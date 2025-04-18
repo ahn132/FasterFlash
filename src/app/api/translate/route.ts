@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
         responseType: 'text'
     }).then(r => {
         parseString(r.data, function(err:any, result:any) {
-            if (result.channel.item[0]) {
+            if (result.channel.item[0] !== null) {
                 for (let i = 0; i < result.channel.item[0].sense.length; i++) {
                     translations.push(result.channel.item[0].sense[i].translation[0].trans_word[0]);
                 }
@@ -27,7 +27,8 @@ export async function POST(req: NextRequest) {
     }).catch(err => {
         console.log(err)
     })
-    console.log(translations)
 
-    return NextResponse.json({ translations: translations});
+    const translations_combined = translations.join("\n\n")
+
+    return NextResponse.json({ translations: translations_combined});
 }
