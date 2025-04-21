@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     const parseString = require('xml2js').parseString;
     const translations : string[]= []
 
-    await axios.get('https://krdict.korean.go.kr/api/search', {
+    axios.get('https://krdict.korean.go.kr/api/search', {
         params: {
             key: process.env.KRDICT_API_KEY,
             q: input,
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
         responseType: 'text'
     }).then(r => {
         parseString(r.data, function(err:any, result:any) {
-            if (result.channel.item[0] !== null) {
+            if (result.channel != undefined && result.channel.item !== undefined && result.channel.item[0] !== null) {
                 for (let i = 0; i < result.channel.item[0].sense.length; i++) {
                     translations.push(result.channel.item[0].sense[i].translation[0].trans_word[0]);
                 }

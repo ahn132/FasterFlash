@@ -9,3 +9,8 @@ export interface NewFlashCardProps {
     onUpdate: Function;
     onDelete: Function;
 }
+
+export interface FlashCardSetBasic {
+    stack_id: number;
+    stack_name: string;
+}

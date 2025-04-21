@@ -4,27 +4,19 @@ import {useRef, useState} from "react";
 import {Card, TextField} from "@mui/material";
 
 export default function NewFlashcard(props: NewFlashCardProps) {
-    const [translated, setTranslated] = useState(false)
+    const [prevTranslAttempt, setPrevTranslAttempt] = useState("")
     const [isFront, setIsFront] = useState(true)
     const [loading, setLoading] = useState(false)
     const [isFocused, setIsFocused] = useState(false)
-    const focusTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     //get automatic translation and put it on back-side of card
     const getTranslation = () => {
-
-        //Don't translate if back of card is already filled
-        if (props.card.back !== "") {
-            setLoading(false)
-            return
-        }
-
+        setPrevTranslAttempt(props.card.front)
         axios.post("/api/translate", {
             input: props.card.front
         }).then(response => {
             props.onUpdate(props.card.id, { back: response.data.translations})
             console.log(response.data.translations);
-            setTranslated(true)
             setLoading(false)
         }).catch(error => {
             console.log(error);
@@ -36,8 +28,18 @@ export default function NewFlashcard(props: NewFlashCardProps) {
         if (isFocused) {
             if (isFront) {
                 setIsFront(false)
-                setLoading(true)
-                getTranslation()
+
+                //Don't translate if already translated and no changes were made
+                if (prevTranslAttempt === props.card.front) {
+                    console.log("EARLY RETURN")
+                    return
+                }
+                else {
+                    console.log("TRANSLATING")
+                    console.log(prevTranslAttempt)
+                    setLoading(true)
+                    getTranslation()
+                }
             }
             else {
                 setIsFront(true)
@@ -52,8 +54,8 @@ export default function NewFlashcard(props: NewFlashCardProps) {
                     value={props.card.front}
                     onChange={(e) => props.onUpdate(props.card.id, { front: e.target.value })}
                     placeholder="Front"
-                    onClick={handleClick}
-                    onFocus={() => setTimeout(() => setIsFocused(true), 100)}
+                    onMouseDown={handleClick}
+                    onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     multiline={true}
                     fullWidth={true}
@@ -88,8 +90,8 @@ export default function NewFlashcard(props: NewFlashCardProps) {
                         value={props.card.back}
                         onChange={(e) => props.onUpdate(props.card.id, { back: e.target.value })}
                         placeholder="Back"
-                        onClick={handleClick}
-                        onFocus={() => setTimeout(() => setIsFocused(true), 100)}
+                        onMouseDown={handleClick}
+                        onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
                         multiline={true}
                         rows={5}
