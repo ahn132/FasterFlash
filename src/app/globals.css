@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+@theme {
+    --color-pale_pink: #FFF1F3;
+    --color-royal_blue: #4B6CB7;
+    --color-jade_green: #A0D8B3;
+    --color-dark_charcoal: #2E2E2E
+}

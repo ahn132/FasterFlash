@@ -6,6 +6,7 @@ import NewFlashcard from "@/app/create/NewFlashcard";
 import {TextField} from "@mui/material";
 import {createClient} from "@/utils/supabase/client"
 import {useRouter} from "next/navigation";
+import "@/app/globals.css"
 
 export default function CreateForm() {
     const [cards, setCards] = useState<Flashcard[]>([{id: 0, front: "", back: ""}]);
@@ -73,24 +74,57 @@ export default function CreateForm() {
     }
 
     return (
-        <div className="max-w-xl mx-auto">
-            <NewFlashcard
-                    key={cards[index].id}
-                    card={cards[index]}
-                    onUpdate={updateCard}
-                    onDelete={deleteCard}
-            />
-            <p>{index}</p>
-            {index !== 0 && <button onClick={() => setIndex(index => index - 1)}>Previous</button>}
-            {index === cards.length - 1 ?
-                <button onClick={addCard}>Add</button> :
-                <button onClick={() => setIndex(index => index + 1)}>Next</button>}
+        <div className="grid grid-cols-4 grid-rows-4 w-screen h-screen">
             <TextField
                 value={stackName}
                 onChange={(e) => setStackName(e.target.value)}
                 placeholder="Stack name"
+                className={"col-span-2 col-start-2 row-span-1 row-start-1"}
+                fullWidth={true}
             />
-            <button onClick={saveStack}>Save flashcard Set</button>
+            <div
+                className={"col-span-2 col-start-2 row-span-2 row-start-2"}>
+                <NewFlashcard
+                    key={cards[index].id}
+                    card={cards[index]}
+                    onUpdate={updateCard}
+                    onDelete={deleteCard}
+                />
+                <button>Front</button>
+            </div>
+            {index !== 0 &&
+                <button
+                    onClick={() => setIndex(index => index - 1)}
+                    className={"row-start-2 row-span-2 col-start-1 col-span-1"}
+                >
+                    Previous
+                </button>
+            }
+            {index === cards.length - 1 ?
+                <button
+                    onClick={addCard}
+                    className={"row-start-2 row-span-2 col-start-4 col-span-1"}
+                >
+                    Add
+                </button> :
+                <button
+                    onClick={() => setIndex(index => index + 1)}
+                    className={"row-start-2 row-span-2 col-start-4 col-span-1"}
+                >
+                    Next
+                </button>
+            }
+            <button
+                className={"row-start-4 row-span-1 col-start-1 col-span-1"}
+            >
+                Auto-translate enabled
+            </button>
+            <button
+                onClick={saveStack}
+                className={"row-start-4 row-span-1 col-start-4 col-span-4"}
+            >
+                Save flashcard Set
+            </button>
         </div>
     );
 }
