@@ -1,7 +1,7 @@
 import {NewFlashCardProps} from "@/types/flashcard";
 import axios from "axios";
 import {useRef, useState} from "react";
-import {Card, TextField} from "@mui/material";
+import {Button, Card, TextField} from "@mui/material";
 
 export default function NewFlashcard(props: NewFlashCardProps) {
     const [prevTranslAttempt, setPrevTranslAttempt] = useState("")
@@ -49,53 +49,18 @@ export default function NewFlashcard(props: NewFlashCardProps) {
 
     if (isFront) {
         return (
-            <Card variant="outlined" raised={true}>
-                <TextField
-                    value={props.card.front}
-                    onChange={(e) => props.onUpdate(props.card.id, { front: e.target.value })}
-                    placeholder="Front"
-                    onMouseDown={handleClick}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    multiline={true}
-                    fullWidth={true}
-                    rows={5}
-                    sx={{
-                        height: '100%',
-
-                        '& .MuiInputBase-root': {
-                            height: '100%',
-                            padding: 0,
-                            alignItems: 'flex-start',
-                        },
-
-                        '& .MuiInputBase-inputMultiline': {
-                            height: '100% !important',
-                            overflow: 'auto',
-                            padding: '8px',
-                            textAlign: 'center', // ✅ this centers the text
-                        },
-                    }}
-                />
-            </Card>
-
-        )
-    }
-    else {
-        return (
-            <Card variant="outlined" raised={true}>
-                {loading ?
-                    <p>Loading</p> :
+            <div>
+                <Card variant="outlined" raised={true}>
                     <TextField
-                        value={props.card.back}
-                        onChange={(e) => props.onUpdate(props.card.id, { back: e.target.value })}
-                        placeholder="Back"
+                        value={props.card.front}
+                        onChange={(e) => props.onUpdate(props.card.id, { front: e.target.value })}
+                        placeholder="Front"
                         onMouseDown={handleClick}
                         onFocus={() => setIsFocused(true)}
                         onBlur={() => setIsFocused(false)}
                         multiline={true}
-                        rows={5}
                         fullWidth={true}
+                        rows={5}
                         sx={{
                             height: '100%',
 
@@ -113,9 +78,50 @@ export default function NewFlashcard(props: NewFlashCardProps) {
                             },
                         }}
                     />
-                }
+                </Card>
+                <Button>BUTTON</Button>
+            </div>
 
-            </Card>
+        )
+    }
+    else {
+        return (
+            <div>
+                <Card variant="outlined" raised={true}>
+                    {loading ?
+                        <p>Loading</p> :
+                        <TextField
+                            value={props.card.back}
+                            onChange={(e) => props.onUpdate(props.card.id, { back: e.target.value })}
+                            placeholder="Back"
+                            onMouseDown={handleClick}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                            multiline={true}
+                            rows={5}
+                            fullWidth={true}
+                            sx={{
+                                height: '100%',
+
+                                '& .MuiInputBase-root': {
+                                    height: '100%',
+                                    padding: 0,
+                                    alignItems: 'flex-start',
+                                },
+
+                                '& .MuiInputBase-inputMultiline': {
+                                    height: '100% !important',
+                                    overflow: 'auto',
+                                    padding: '8px',
+                                    textAlign: 'center', // ✅ this centers the text
+                                },
+                            }}
+                        />
+                    }
+                </Card>
+                <Button>BUTTON</Button>
+            </div>
+
         )
     }
 }

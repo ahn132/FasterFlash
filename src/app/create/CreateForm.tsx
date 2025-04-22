@@ -3,7 +3,10 @@
 import { useState } from "react";
 import {Flashcard} from "@/types/flashcard";
 import NewFlashcard from "@/app/create/NewFlashcard";
-import {TextField} from "@mui/material";
+import {Button, IconButton, TextField} from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import {createClient} from "@/utils/supabase/client"
 import {useRouter} from "next/navigation";
 import "@/app/globals.css"
@@ -13,6 +16,7 @@ export default function CreateForm() {
     const [nextID, setNextID] = useState(1);
     const [index, setIndex] = useState(0)
     const [stackName, setStackName] = useState("")
+    const [autoTranslate, setAutoTranslate] = useState(true)
     const supabase = createClient()
     const router = useRouter()
 
@@ -90,41 +94,61 @@ export default function CreateForm() {
                     onUpdate={updateCard}
                     onDelete={deleteCard}
                 />
-                <button>Front</button>
             </div>
             {index !== 0 &&
-                <button
+                <IconButton
                     onClick={() => setIndex(index => index - 1)}
-                    className={"row-start-2 row-span-2 col-start-1 col-span-1"}
+                    className={"row-start-2 row-span-2 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
                 >
-                    Previous
-                </button>
+                    <ArrowBackIcon sx={{ fontSize: 40 }}/>
+                </IconButton>
             }
             {index === cards.length - 1 ?
-                <button
+                <IconButton
                     onClick={addCard}
-                    className={"row-start-2 row-span-2 col-start-4 col-span-1"}
+                    className={"row-start-2 row-span-2 col-start-4 col-span-1 w-fit h-fit self-center justify-self-center"}
                 >
-                    Add
-                </button> :
-                <button
+                    <AddIcon sx={{ fontSize: 40 }}/>
+                </IconButton> :
+                <IconButton
                     onClick={() => setIndex(index => index + 1)}
-                    className={"row-start-2 row-span-2 col-start-4 col-span-1"}
+                    className={"row-start-2 row-span-2 col-start-4 col-span-1 w-fit h-fit self-center justify-self-center"}
                 >
-                    Next
-                </button>
+                    <ArrowForwardIcon sx={{ fontSize: 40 }}/>
+                </IconButton>
             }
-            <button
-                className={"row-start-4 row-span-1 col-start-1 col-span-1"}
-            >
-                Auto-translate enabled
-            </button>
-            <button
+            {autoTranslate ?
+                <Button
+                    className={"row-start-4 row-span-1 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
+                    variant="contained"
+                    sx={{
+                        backgroundColor: '#6a1b9a', // custom color
+                        '&:hover': {
+                            backgroundColor: '#4a148c', // darker on hover
+                        },
+                    }}
+                    onClick={() => setAutoTranslate(false)}
+                >
+                    Auto-translate enabled
+                </Button> :
+                <Button
+                    className={"row-start-4 row-span-1 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
+                    variant="contained"
+                    sx={{ backgroundColor: 'royal_blue', color: '#fff' }}
+                    onClick={() => setAutoTranslate(true)}
+                >
+                    Auto-translate disabled
+                </Button>
+            }
+
+            <Button
                 onClick={saveStack}
-                className={"row-start-4 row-span-1 col-start-4 col-span-4"}
+                className={"row-start-4 row-span-1 col-start-4 col-span-4 w-fit h-fit self-center justify-self-center"}
+                variant="contained"
+                sx={{ backgroundColor: 'royal_blue', color: '#fff' }}
             >
                 Save flashcard Set
-            </button>
+            </Button>
         </div>
     );
 }
