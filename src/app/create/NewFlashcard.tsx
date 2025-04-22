@@ -1,13 +1,16 @@
 import {NewFlashCardProps} from "@/types/flashcard";
 import axios from "axios";
 import {useRef, useState} from "react";
-import {Button, Card, TextField} from "@mui/material";
+import {Card, CardContent} from "@/components/ui/card"
+import {Textarea} from "@/components/ui/textarea"
+import {Button} from "@/components/ui/button"
+import {Spinner} from "@/components/ui/spinner"
+import { cn } from "@/lib/utils"
 
 export default function NewFlashcard(props: NewFlashCardProps) {
     const [prevTranslAttempt, setPrevTranslAttempt] = useState("")
     const [isFront, setIsFront] = useState(true)
     const [loading, setLoading] = useState(false)
-    const [isFocused, setIsFocused] = useState(false)
 
     //get automatic translation and put it on back-side of card
     const getTranslation = () => {
@@ -23,103 +26,56 @@ export default function NewFlashcard(props: NewFlashCardProps) {
         })
     }
 
-    //flip the card if the card/text is in focus and the user clicks on the card/text
+    //flip the card and possibly translate it
     const handleClick = () => {
-        if (isFocused) {
-            if (isFront) {
-                setIsFront(false)
+        if (isFront) {
+            setIsFront(false)
 
-                //Don't translate if already translated and no changes were made
-                if (prevTranslAttempt === props.card.front) {
-                    console.log("EARLY RETURN")
-                    return
-                }
-                else {
-                    console.log("TRANSLATING")
-                    console.log(prevTranslAttempt)
-                    setLoading(true)
-                    getTranslation()
-                }
+            //Don't translate if already translated and no changes were made...or auto-translate is disabled
+            if (prevTranslAttempt === props.card.front || !props.autoTranslate) {
+                return
             }
             else {
-                setIsFront(true)
+                setLoading(true)
+                getTranslation()
             }
+        }
+        else {
+            setIsFront(true)
         }
     };
 
     if (isFront) {
         return (
-            <div>
-                <Card variant="outlined" raised={true}>
-                    <TextField
+            <div className="flex flex-col gap-2 w-full h-full">
+                <Card className="p-0 w-full h-full items-center justify-center">
+                    <Textarea
                         value={props.card.front}
                         onChange={(e) => props.onUpdate(props.card.id, { front: e.target.value })}
                         placeholder="Front"
-                        onMouseDown={handleClick}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => setIsFocused(false)}
-                        multiline={true}
-                        fullWidth={true}
-                        rows={5}
-                        sx={{
-                            height: '100%',
-
-                            '& .MuiInputBase-root': {
-                                height: '100%',
-                                padding: 0,
-                                alignItems: 'flex-start',
-                            },
-
-                            '& .MuiInputBase-inputMultiline': {
-                                height: '100% !important',
-                                overflow: 'auto',
-                                padding: '8px',
-                                textAlign: 'center', // ✅ this centers the text
-                            },
-                        }}
+                        className="resize-none border-none text-center p-20 text-3xl md:text-3xl"
                     />
                 </Card>
-                <Button>BUTTON</Button>
+                <Button onClick={handleClick}>FLIP TO BACK</Button>
             </div>
 
         )
     }
     else {
         return (
-            <div>
-                <Card variant="outlined" raised={true}>
+            <div className="flex flex-col gap-2 w-full h-full">
+                <Card className="p-0 w-full h-full items-center justify-center">
                     {loading ?
-                        <p>Loading</p> :
-                        <TextField
+                        <Spinner className=""/> :
+                        <Textarea
                             value={props.card.back}
                             onChange={(e) => props.onUpdate(props.card.id, { back: e.target.value })}
                             placeholder="Back"
-                            onMouseDown={handleClick}
-                            onFocus={() => setIsFocused(true)}
-                            onBlur={() => setIsFocused(false)}
-                            multiline={true}
-                            rows={5}
-                            fullWidth={true}
-                            sx={{
-                                height: '100%',
-
-                                '& .MuiInputBase-root': {
-                                    height: '100%',
-                                    padding: 0,
-                                    alignItems: 'flex-start',
-                                },
-
-                                '& .MuiInputBase-inputMultiline': {
-                                    height: '100% !important',
-                                    overflow: 'auto',
-                                    padding: '8px',
-                                    textAlign: 'center', // ✅ this centers the text
-                                },
-                            }}
+                            className="resize-none border-none text-center p-20 text-3xl md:text-3xl"
                         />
                     }
                 </Card>
-                <Button>BUTTON</Button>
+                <Button onClick={handleClick}>FLIP TO FRONT</Button>
             </div>
 
         )

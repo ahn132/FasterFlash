@@ -8,6 +8,7 @@ export interface NewFlashCardProps {
     card: Flashcard;
     onUpdate: Function;
     onDelete: Function;
+    autoTranslate: boolean;
 }
 
 export interface FlashCardSetBasic {

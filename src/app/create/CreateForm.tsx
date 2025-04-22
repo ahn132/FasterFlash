@@ -3,13 +3,15 @@
 import { useState } from "react";
 import {Flashcard} from "@/types/flashcard";
 import NewFlashcard from "@/app/create/NewFlashcard";
-import {Button, IconButton, TextField} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import {Button} from "@/components/ui/button"
+import {Textarea} from "@/components/ui/textarea"
 import {createClient} from "@/utils/supabase/client"
 import {useRouter} from "next/navigation";
 import "@/app/globals.css"
+import {TypographyP} from "@/components/ui/typography";
 
 export default function CreateForm() {
     const [cards, setCards] = useState<Flashcard[]>([{id: 0, front: "", back: ""}]);
@@ -17,6 +19,7 @@ export default function CreateForm() {
     const [index, setIndex] = useState(0)
     const [stackName, setStackName] = useState("")
     const [autoTranslate, setAutoTranslate] = useState(true)
+    const [cardsFilled, setCardsFilled] = useState(false)
     const supabase = createClient()
     const router = useRouter()
 
@@ -28,6 +31,7 @@ export default function CreateForm() {
         ]);
         setNextID(nextID => nextID + 1)
         setIndex(index => index + 1)
+        setCardsFilled(false)
     };
 
     const updateCard = (id: number, changes: Partial<Flashcard>) => {
@@ -79,76 +83,89 @@ export default function CreateForm() {
 
     return (
         <div className="grid grid-cols-4 grid-rows-4 w-screen h-screen">
-            <TextField
+            <Textarea
                 value={stackName}
                 onChange={(e) => setStackName(e.target.value)}
                 placeholder="Stack name"
-                className={"col-span-2 col-start-2 row-span-1 row-start-1"}
-                fullWidth={true}
+                rows={2}
+                className={"col-span-2 col-start-2 row-span-1 row-start-1 min-h-[auto] self-center text-center text-3xl md:text-3xl resize-none"}
             />
             <div
                 className={"col-span-2 col-start-2 row-span-2 row-start-2"}>
+                <TypographyP className="text-center mb-1">Card {index + 1} of {cards.length}</TypographyP>
                 <NewFlashcard
                     key={cards[index].id}
                     card={cards[index]}
                     onUpdate={updateCard}
                     onDelete={deleteCard}
+                    autoTranslate={autoTranslate}
                 />
             </div>
-            {index !== 0 &&
-                <IconButton
+            {index !== 0 ?
+                <Button
                     onClick={() => setIndex(index => index - 1)}
                     className={"row-start-2 row-span-2 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
                 >
                     <ArrowBackIcon sx={{ fontSize: 40 }}/>
-                </IconButton>
+                </Button>
+                :
+                <Button
+                    variant="outline"
+                    disabled={true}
+                    className={"row-start-2 row-span-2 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
+                >
+                    <ArrowBackIcon sx={{ fontSize: 40 }}/>
+                </Button>
             }
             {index === cards.length - 1 ?
-                <IconButton
+                <Button
                     onClick={addCard}
                     className={"row-start-2 row-span-2 col-start-4 col-span-1 w-fit h-fit self-center justify-self-center"}
                 >
                     <AddIcon sx={{ fontSize: 40 }}/>
-                </IconButton> :
-                <IconButton
+                </Button> :
+                <Button
                     onClick={() => setIndex(index => index + 1)}
                     className={"row-start-2 row-span-2 col-start-4 col-span-1 w-fit h-fit self-center justify-self-center"}
                 >
                     <ArrowForwardIcon sx={{ fontSize: 40 }}/>
-                </IconButton>
+                </Button>
             }
             {autoTranslate ?
                 <Button
                     className={"row-start-4 row-span-1 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
-                    variant="contained"
-                    sx={{
-                        backgroundColor: '#6a1b9a', // custom color
-                        '&:hover': {
-                            backgroundColor: '#4a148c', // darker on hover
-                        },
-                    }}
                     onClick={() => setAutoTranslate(false)}
                 >
                     Auto-translate enabled
                 </Button> :
                 <Button
+                    variant="outline"
                     className={"row-start-4 row-span-1 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
-                    variant="contained"
-                    sx={{ backgroundColor: 'royal_blue', color: '#fff' }}
                     onClick={() => setAutoTranslate(true)}
                 >
                     Auto-translate disabled
                 </Button>
             }
 
-            <Button
-                onClick={saveStack}
-                className={"row-start-4 row-span-1 col-start-4 col-span-4 w-fit h-fit self-center justify-self-center"}
-                variant="contained"
-                sx={{ backgroundColor: 'royal_blue', color: '#fff' }}
-            >
-                Save flashcard Set
-            </Button>
+            {stackName.length !== 0 && cards.every(card => card.front.length !== 0 && card.back.length !== 0) ?
+                <Button
+                    onClick={saveStack}
+                    className={"row-start-4 row-span-1 col-start-4 col-span-4 w-fit h-fit self-center justify-self-center"}
+                >
+                    Save flashcard Set
+                </Button>
+                :
+                <Button
+                    disabled={true}
+                    variant="outline"
+                    onClick={saveStack}
+                    className={"row-start-4 row-span-1 col-start-4 col-span-4 w-fit h-fit self-center justify-self-center"}
+                >
+                    Save flashcard Set
+                </Button>
+            }
+
+
         </div>
     );
 }
