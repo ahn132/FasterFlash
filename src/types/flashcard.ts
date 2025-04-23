@@ -1,5 +1,5 @@
 export type Flashcard = {
-    id: number;
+    index: number;
     front: string;
     back: string;
 };

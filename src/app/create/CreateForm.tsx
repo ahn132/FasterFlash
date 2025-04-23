@@ -14,12 +14,11 @@ import "@/app/globals.css"
 import {TypographyP} from "@/components/ui/typography";
 
 export default function CreateForm() {
-    const [cards, setCards] = useState<Flashcard[]>([{id: 0, front: "", back: ""}]);
+    const [cards, setCards] = useState<Flashcard[]>([{index: 0, front: "", back: ""}]);
     const [nextID, setNextID] = useState(1);
     const [index, setIndex] = useState(0)
     const [stackName, setStackName] = useState("")
     const [autoTranslate, setAutoTranslate] = useState(true)
-    const [cardsFilled, setCardsFilled] = useState(false)
     const supabase = createClient()
     const router = useRouter()
 
@@ -27,23 +26,23 @@ export default function CreateForm() {
     const addCard = () => {
         setCards(prev => [
             ...prev,
-            { id: nextID, front: "", back: "" }
+            { index: nextID, front: "", back: "" }
         ]);
         setNextID(nextID => nextID + 1)
         setIndex(index => index + 1)
-        setCardsFilled(false)
     };
 
-    const updateCard = (id: number, changes: Partial<Flashcard>) => {
+    const updateCard = (index: number, changes: Partial<Flashcard>) => {
         setCards(prev =>
             prev.map(card =>
-                card.id == id ? { ...card, ...changes } : card
+                card.index == index ? { ...card, ...changes } : card
             )
         );
     };
 
-    const deleteCard = (id: number) => {
-        setCards(prev => prev.filter(card => card.id !== id));
+    const deleteCard = (index: number) => {
+        setCards(prev => prev.filter(card => card.index !== index));
+        setIndex(index => index - 1)
     };
 
     const saveStack = async () => {
@@ -94,29 +93,21 @@ export default function CreateForm() {
                 className={"col-span-2 col-start-2 row-span-2 row-start-2"}>
                 <TypographyP className="text-center mb-1">Card {index + 1} of {cards.length}</TypographyP>
                 <NewFlashcard
-                    key={cards[index].id}
+                    key={index}
                     card={cards[index]}
                     onUpdate={updateCard}
                     onDelete={deleteCard}
                     autoTranslate={autoTranslate}
                 />
             </div>
-            {index !== 0 ?
-                <Button
-                    onClick={() => setIndex(index => index - 1)}
-                    className={"row-start-2 row-span-2 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
-                >
-                    <ArrowBackIcon sx={{ fontSize: 40 }}/>
-                </Button>
-                :
-                <Button
-                    variant="outline"
-                    disabled={true}
-                    className={"row-start-2 row-span-2 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
-                >
-                    <ArrowBackIcon sx={{ fontSize: 40 }}/>
-                </Button>
-            }
+            <Button
+                onClick={() => setIndex(index => index - 1)}
+                className={"row-start-2 row-span-2 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
+                variant={index !== 0 ? "default" : "outline"}
+                disabled={index === 0}
+            >
+                <ArrowBackIcon sx={{ fontSize: 40 }}/>
+            </Button>
             {index === cards.length - 1 ?
                 <Button
                     onClick={addCard}
@@ -131,39 +122,22 @@ export default function CreateForm() {
                     <ArrowForwardIcon sx={{ fontSize: 40 }}/>
                 </Button>
             }
-            {autoTranslate ?
-                <Button
-                    className={"row-start-4 row-span-1 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
-                    onClick={() => setAutoTranslate(false)}
-                >
-                    Auto-translate enabled
-                </Button> :
-                <Button
-                    variant="outline"
-                    className={"row-start-4 row-span-1 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
-                    onClick={() => setAutoTranslate(true)}
-                >
-                    Auto-translate disabled
-                </Button>
-            }
+            <Button
+                className={"row-start-4 row-span-1 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"}
+                onClick={() => setAutoTranslate(!autoTranslate)}
+                variant={autoTranslate ? "default" : "outline"}
+            >
+                Auto-translate {autoTranslate ? "enabled" : "disabled"}
+            </Button>
 
-            {stackName.length !== 0 && cards.every(card => card.front.length !== 0 && card.back.length !== 0) ?
-                <Button
-                    onClick={saveStack}
-                    className={"row-start-4 row-span-1 col-start-4 col-span-4 w-fit h-fit self-center justify-self-center"}
-                >
-                    Save flashcard Set
-                </Button>
-                :
-                <Button
-                    disabled={true}
-                    variant="outline"
-                    onClick={saveStack}
-                    className={"row-start-4 row-span-1 col-start-4 col-span-4 w-fit h-fit self-center justify-self-center"}
-                >
-                    Save flashcard Set
-                </Button>
-            }
+            <Button
+                disabled={!(stackName.length !== 0 && cards.every(card => card.front.length !== 0 && card.back.length !== 0))}
+                variant={stackName.length !== 0 && cards.every(card => card.front.length !== 0 && card.back.length !== 0) ? "default" : "outline"}
+                onClick={saveStack}
+                className={"row-start-4 row-span-1 col-start-4 col-span-4 w-fit h-fit self-center justify-self-center"}
+            >
+                Save flashcard Set
+            </Button>
 
 
         </div>

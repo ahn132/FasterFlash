@@ -6,6 +6,9 @@ import {Textarea} from "@/components/ui/textarea"
 import {Button} from "@/components/ui/button"
 import {Spinner} from "@/components/ui/spinner"
 import { cn } from "@/lib/utils"
+import {motion} from "motion/react"
+
+const MotionCard = motion(Card)
 
 export default function NewFlashcard(props: NewFlashCardProps) {
     const [prevTranslAttempt, setPrevTranslAttempt] = useState("")
@@ -18,7 +21,7 @@ export default function NewFlashcard(props: NewFlashCardProps) {
         axios.post("/api/translate", {
             input: props.card.front
         }).then(response => {
-            props.onUpdate(props.card.id, { back: response.data.translations})
+            props.onUpdate(props.card.index, { back: response.data.translations})
             console.log(response.data.translations);
             setLoading(false)
         }).catch(error => {
@@ -27,7 +30,7 @@ export default function NewFlashcard(props: NewFlashCardProps) {
     }
 
     //flip the card and possibly translate it
-    const handleClick = () => {
+    const handleFlip = () => {
         if (isFront) {
             setIsFront(false)
 
@@ -45,39 +48,56 @@ export default function NewFlashcard(props: NewFlashCardProps) {
         }
     };
 
-    if (isFront) {
-        return (
-            <div className="flex flex-col gap-2 w-full h-full">
-                <Card className="p-0 w-full h-full items-center justify-center">
+    const handleDelete = () => {
+        props.onDelete(props.card.index)
+    }
+
+    return (
+        <div className="flex flex-col gap-2 w-full h-full" style={{ perspective: 1000 }}>
+            <motion.div
+                animate={{ rotateX: isFront ? 0 : 180 }}
+                transition={{ duration: 0.6 }}
+                className="relative w-full h-full rounded-xl border"
+                style={{
+                    transformStyle: 'preserve-3d',
+                }}
+            >
+                {/* FRONT */}
+                <div className="absolute w-full h-full p-0 items-center justify-center flex backface-hidden">
                     <Textarea
                         value={props.card.front}
-                        onChange={(e) => props.onUpdate(props.card.id, { front: e.target.value })}
+                        onChange={(e) => props.onUpdate(props.card.index, { front: e.target.value })}
                         placeholder="Front"
-                        className="resize-none border-none text-center p-20 text-3xl md:text-3xl"
+                        className="resize-none border-none text-center p-20 text-3xl md:text-3xl w-full h-full"
                     />
-                </Card>
-                <Button onClick={handleClick}>FLIP TO BACK</Button>
-            </div>
+                </div>
 
-        )
-    }
-    else {
-        return (
-            <div className="flex flex-col gap-2 w-full h-full">
-                <Card className="p-0 w-full h-full items-center justify-center">
-                    {loading ?
-                        <Spinner className=""/> :
+                {/* BACK */}
+                <div
+                    className="absolute w-full h-full p-0 items-center justify-center flex backface-hidden"
+                    style={{
+                        transform: 'rotateX(180deg)',
+                    }}
+                >
+                    {loading ? (
+                        <Spinner />
+                    ) : (
                         <Textarea
                             value={props.card.back}
-                            onChange={(e) => props.onUpdate(props.card.id, { back: e.target.value })}
+                            onChange={(e) => props.onUpdate(props.card.index, { back: e.target.value })}
                             placeholder="Back"
-                            className="resize-none border-none text-center p-20 text-3xl md:text-3xl"
+                            className="resize-none border-none text-center p-20 text-3xl md:text-3xl w-full h-full"
                         />
-                    }
-                </Card>
-                <Button onClick={handleClick}>FLIP TO FRONT</Button>
-            </div>
+                    )}
+                </div>
+            </motion.div>
 
-        )
-    }
+            <Button onClick={handleFlip}>
+                {isFront ? 'FLIP TO BACK' : 'FLIP TO FRONT'}
+            </Button>
+            <Button onClick={handleDelete} variant={props.card.index !== 0 ? "default" : "outline" } disabled={props.card.index === 0}>
+                DELETE CARD
+            </Button>
+        </div>
+    )
 }
