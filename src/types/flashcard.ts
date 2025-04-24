@@ -11,6 +11,10 @@ export interface NewFlashCardProps {
     autoTranslate: boolean;
 }
 
+export interface StudyFlashCardProps {
+    card: Flashcard;
+}
+
 export interface FlashCardSetBasic {
     stack_id: number;
     stack_name: string;

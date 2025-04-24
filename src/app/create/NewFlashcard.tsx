@@ -57,7 +57,7 @@ export default function NewFlashcard(props: NewFlashCardProps) {
             <motion.div
                 animate={{ rotateX: isFront ? 0 : 180 }}
                 transition={{ duration: 0.6 }}
-                className="relative w-full h-full rounded-xl border"
+                className="relative w-full h-full rounded-xl border-2"
                 style={{
                     transformStyle: 'preserve-3d',
                 }}
@@ -68,7 +68,7 @@ export default function NewFlashcard(props: NewFlashCardProps) {
                         value={props.card.front}
                         onChange={(e) => props.onUpdate(props.card.index, { front: e.target.value })}
                         placeholder="Front"
-                        className="resize-none border-none text-center p-20 text-3xl md:text-3xl w-full h-full"
+                        className="resize-none border-none text-center p-20 text-3xl md:text-3xl w-full h-full scrollbar-hide"
                     />
                 </div>
 
@@ -86,7 +86,7 @@ export default function NewFlashcard(props: NewFlashCardProps) {
                             value={props.card.back}
                             onChange={(e) => props.onUpdate(props.card.index, { back: e.target.value })}
                             placeholder="Back"
-                            className="resize-none border-none text-center p-20 text-3xl md:text-3xl w-full h-full"
+                            className="resize-none border-none text-center p-20 text-3xl md:text-3xl w-full h-full scrollbar-hide"
                         />
                     )}
                 </div>

@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from "react";
-import { Flashcard } from "@/types/flashcard";
+import {useEffect, useState} from "react";
+import {Flashcard, FlashCardSetBasic} from "@/types/flashcard";
 import NewFlashcard from "@/app/create/NewFlashcard";
 import AddIcon from '@mui/icons-material/Add';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -10,18 +10,61 @@ import HomeIcon from '@mui/icons-material/Home';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { createClient } from "@/utils/supabase/client";
-import { useRouter } from "next/navigation";
+import {useParams, useRouter} from "next/navigation";
 import "@/app/globals.css";
 import { TypographyP } from "@/components/ui/typography";
 
-export default function Page() {
+export default function EditPage() {
     const [cards, setCards] = useState<Flashcard[]>([{ index: 0, front: "", back: "" }]);
     const [nextID, setNextID] = useState(1);
     const [index, setIndex] = useState(0);
     const [stackName, setStackName] = useState("");
-    const [autoTranslate, setAutoTranslate] = useState(true);
+    const [autoTranslate, setAutoTranslate] = useState(false);
     const supabase = createClient();
     const router = useRouter();
+
+    const {stack_id} = useParams()
+
+    useEffect(() => {
+        const loadCards = async () => {
+
+            //get stack name
+            const {data: stackInfo, error: stackError} = await supabase
+                .from('flashcard_sets')
+                .select('stack_name')
+                .eq('stack_id', stack_id)
+            if (!stackError) {
+                setStackName(stackInfo[0].stack_name)
+            }
+            else {
+                alert(stackError.message);
+            }
+
+            //get cards
+            const { data: flashcards, error: flashcardsError } = await supabase
+                .from('flashcards')
+                .select('index, front, back')
+                .eq('stack_id', stack_id);
+            if (!flashcardsError) {
+                flashcards.sort(function(a, b) {
+                    if (a.index > b.index) {
+                        return 1;
+                    }
+                    if (a.index < b.index) {
+                        return -1;
+                    }
+                    return 0;
+                });
+                setCards(flashcards);
+                setNextID(flashcards.length)
+            }
+            else {
+                alert(flashcardsError.message);
+            }
+        };
+
+        loadCards();
+    }, [stack_id]);
 
     const addCard = () => {
         setCards(prev => [...prev, { index: nextID, front: "", back: "" }]);
@@ -40,21 +83,37 @@ export default function Page() {
 
     const saveStack = async () => {
         const { data: { user } } = await supabase.auth.getUser();
-        const { data, error } = await supabase
+
+        await supabase
             .from('flashcard_sets')
-            .insert([{ user_id: user!.id, stack_name: stackName }])
-            .select('stack_id');
+            .update({ stack_name: stackName })
+            .eq('stack_id', stack_id);
 
         for (const card of cards) {
-            await supabase.from('flashcards').insert([{
-                user_id: user!.id,
-                stack_id: data![0].stack_id,
-                index: card.index,
-                front: card.front,
-                back: card.back,
-            }]);
-        }
+            const { data, error } = await supabase
+                .from('flashcards')
+                .update({
+                    front: card.front,
+                    back: card.back,
+                })
+                .eq('stack_id', stack_id)
+                .eq('index', card.index)
+                .select()
 
+            if (error) {
+                alert(error.message);
+            } else if (data.length === 0) {
+                await supabase.from('flashcards').insert([
+                    {
+                        user_id: user!.id,
+                        stack_id: stack_id,
+                        index: card.index,
+                        front: card.front,
+                        back: card.back,
+                    }
+                ]);
+            }
+        }
         router.push("/");
     };
 
@@ -114,7 +173,6 @@ export default function Page() {
             <Button
                 className="row-start-4 row-span-1 col-start-1 col-span-1 w-fit h-fit self-center justify-self-center"
                 onClick={() => setAutoTranslate(!autoTranslate)}
-                variant={autoTranslate ? "default" : "outline"}
             >
                 Auto-translate {autoTranslate ? "enabled" : "disabled"}
             </Button>
