@@ -1,36 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Faster Flash
 
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*Faster Flash is a rapid flashcard creation and review app designed to help you master languages faster, \
+starting with Korean to English Translation*
+\
+\
+This was a quick prototype I made in the span of about a week, with the goal of familiarizing myself with Next.js\
+and Supabase. Moreover, I handled all the user authentication and database management with Supabase. \
+I also utilized the krdict API for translation, as well as Material UI, Shadcn, and Framer Motion for frontend styling.
+\
+\
+The idea behind the project was that it can take a long time to build flashcard sets to learn new languages.\
+For example, say that I want to learn Korean. Say that I see a new Korean word. In order to create a new flashcard\
+for this word, I would need to first get the English translation to make a flashcard using Quizlet, Anki, or some other\
+flashcard tool. However, with this app, you can enable auto-translations such that you only need to enter the
+Korean word on the front of the flashcard, and the app will automatically translate and input the back-side for you.
+\
+\
+The app only has Korean-to-English translation for now, but the fundamental idea could be applied and expanded for more
+\
+language combinations.
+\
+\
+Because I utilized the free version of Supabase, the database will be put to sleep after 7 days of inactivity and \
+permanently deleted after 30 more days of inactivity. As such, I included screenshots and gifs below to showcase the 
+functionality of the app before the database goes down.
+\
+\
+![Auto-translation example](/demo/translation.gif)
+![Login Page](/demo/login_page.png)
+![Home Page](/demo/home_page.png)
+![Study Page](/demo/study_page.png)
+![Library Page](/demo/library_page.png)
